@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Guitar from "./components/Guitar"
+import Header from "./components/Header"
+import { db } from "./data/db"
+import { useState } from "react"
+
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
+    //State 
+    const [data, setData] = useState(db)
+
+
+
+    return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Hola mundo en React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+        <Header />
+    <main className="container-xl mt-5">
+        <h2 className="text-center">Nuestra Colección</h2>
+
+        <div className="row mt-5">
+            {data.map((guitar) => (
+                <Guitar
+                    key={guitar.id}
+                    guitar = {guitar}
+                />
+            ))}
+
+        </div>
+    </main>
+
+
+    <footer className="bg-dark mt-5 py-5">
+        <div className="container-xl">
+            <p className="text-white text-center fs-4 mt-4 m-md-0">GuitarLA - Todos los derechos Reservados</p>
+        </div>
+    </footer>
     </>
-  )
+)
 }
 
 export default App
