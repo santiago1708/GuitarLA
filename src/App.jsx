@@ -1,19 +1,82 @@
 import Guitar from "./components/Guitar"
 import Header from "./components/Header"
 import { db } from "./data/db"
-import { useState } from "react"
+import { useState , useEffect} from "react"
 
 
 function App() {
 
-    //State 
-    const [data, setData] = useState(db)
+    const initialCart = () => {
+        const localStorageCart = localStorage.getItem('cart')
+        return localStorageCart ? JSON.parse(localStorageCart) : [] //JSON.parce lo convierte a un arreglo
+    }
 
+    //State 
+    const [data] = useState(db)
+    const [cart, setCart] = useState(initialCart)
+
+    const MAX_ITEMS = 5
+    const MIN_ITEMS = 1
+
+    useEffect(() => {
+        localStorage.setItem('cart', JSON.stringify(cart))
+    }, [cart])
+
+    function addToCart(item) {
+        const itemsE = cart.findIndex((guitar) => guitar.id === item.id)
+        if(itemsE < 0 ){
+            item.quantity = 1
+            setCart([...cart, item])
+        }else {
+            if(cart[itemsE].quantity >= MAX_ITEMS) return 
+            const updateCart = [...cart]
+            updateCart[itemsE].quantity++
+            setCart(updateCart)
+        }
+    }
+
+    function removeFromCart(id) {
+        setCart((prevCart) => prevCart.filter(guitar => guitar.id !== id))
+    }
+
+    function increaseQuanquity(id) {
+        const updatedCart = cart.map((item) => {
+            if(item.id === id && item.quantity < MAX_ITEMS){
+                return {
+                    ...item, 
+                    quantity: item.quantity + 1}
+            }
+            return item
+        }) 
+        setCart(updatedCart)
+    }
+
+    function DecreaseQuanquity(id) {
+        const updatedCart = cart.map((item) => {
+            if(item.id === id && item.quantity > MIN_ITEMS){
+                return {
+                    ...item, 
+                    quantity: item.quantity - 1}
+            }
+            return item
+        }) 
+        setCart(updatedCart)
+    }
+
+    function cleanCart() {
+        setCart([])
+    }
 
 
     return (
     <>
-        <Header />
+        <Header 
+            cart={cart}
+            removeFromCart = {removeFromCart}
+            increaseQuanquity = {increaseQuanquity}
+            DecreaseQuanquity = {DecreaseQuanquity}
+            cleanCart = {cleanCart}
+        />
     <main className="container-xl mt-5">
         <h2 className="text-center">Nuestra Colección</h2>
 
@@ -22,6 +85,8 @@ function App() {
                 <Guitar
                     key={guitar.id}
                     guitar = {guitar}
+                    setCart = {setCart}
+                    addToCart = {addToCart}
                 />
             ))}
 
